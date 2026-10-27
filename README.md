@@ -6,9 +6,9 @@ Funções implementadas:
 
 -> main.c
 
--> particoes.c
+-> particoes.c:
 
--> particoes.h
+-> particoes.h: 
  int selecao_natural(FILE *arq, Lista *nome_arquivos_saida, int M, int nFunc, int n);
 
 ## Intercalação 
