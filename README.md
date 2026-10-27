@@ -3,6 +3,7 @@ Objetivo: Desenvolver o algoritmo de Geração de Partições utilizando o méto
 
 ## Geração de Partições 
 Funções implementadas:
+
 -> main.c
 
 -> particoes.c
