@@ -16,5 +16,4 @@ o númer de elementos M a ser armazenado em cada partição e o número de regis
 Fiquem a vontade para modificar a estrutura, foi uma sugestão.*/
 int selecao_natural(FILE *arq, Lista *nome_arquivos_saida, int M, int nFunc, int n);
 
-
 #endif
