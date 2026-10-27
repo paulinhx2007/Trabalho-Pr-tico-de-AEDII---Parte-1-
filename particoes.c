@@ -61,5 +61,20 @@ void classificacao_interna(FILE *arq, Lista *nome_arquivos_saida, int M, int nFu
 }
 
 void selecao_natural(FILE *arq, Lista *nome_arquivos_saida, int M, int nFunc, int n){
-    /*PARTE 1 TRABALHO*/
+    TFunc **memoria;
+    FILE *reservatorio;
+    int ativos = 0, lidos = 0, guardados = 0, particoes = 0;
+    int erro = 0;
+    if (!arq || !nomes || M <= 0 || n <= 0 || n > M || nFunc <= 0) {
+        printf("Parametros invalidos ou base vazia.\n");
+        return -1;
+    }
+    memoria = calloc((size_t) M, sizeof(*memoria));
+    reservatorio = tmpfile();
+    if (!memoria || !reservatorio) {
+        printf("Erro ao criar memoria ou reservatorio.\n");
+        free(memoria);
+        if (reservatorio) fclose(reservatorio);
+        return -1;
+    }
 }
