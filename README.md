@@ -161,3 +161,7 @@ int selecao_natural(FILE *arq, Lista *nome_arquivos_saida, int M, int nFunc, int
 ## Intercalação
 
 Funções implementadas:
+
+- `vencedor`: devolve o índice da partição com a menor chave.
+- `constroi`: monta a árvore de vencedores a partir das chaves iniciais.
+- `atualiza`: refaz o caminho da folha até a raiz após consumir um registro.
