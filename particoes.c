@@ -77,32 +77,7 @@ int selecao_natural(FILE *arq, Lista *nomes, int M, int nFunc, int n) {
         if (reservatorio) fclose(reservatorio);
         return -1;
     }
-    rewind(arq);
-    while (ativos < M && lidos < nFunc) {
-        if (fseek(arq, (long) lidos * tamanho_registro(), SEEK_SET) != 0 ||
-            !(memoria[ativos] = le_funcionario(arq))) { erro = 1; break; }
-        ativos++; lidos++;
-    }
-    while (!erro && ativos > 0) {
-        FILE *saida;
-        int escritos = 0, reservatorio_cheio = 0;
-        if (!nomes) { printf("Faltam nomes para as particoes.\n"); erro = 1; break; }
-        saida = fopen(nomes->nome, "wb+");
-        if (!saida) { printf("Erro ao criar %s.\n", nomes->nome); erro = 1; break; }
-        printf("\nParticao %s:\n", nomes->nome);
-        while (ativos > 0 && !erro) {
-            int menor = 0, ultima_chave;
-            TFunc *novo = NULL;
-            for (int i = 1; i < ativos; i++)
-                if (memoria[i]->cod < memoria[menor]->cod) menor = i;
-            ultima_chave = memoria[menor]->cod;
-            if (fseek(saida, (long) escritos * tamanho_registro(), SEEK_SET) != 0) { erro = 1; break; }
-            salva_funcionario(memoria[menor], saida);
-            imprime_funcionario(memoria[menor]);
-            escritos++;
-            free(memoria[menor]);
-            memoria[menor] = memoria[--ativos];
-            memoria[ativos] = NULL;
+    
             while (!reservatorio_cheio && lidos < nFunc) {
                 if (fseek(arq, (long) lidos * tamanho_registro(), SEEK_SET) != 0 ||
                     !(novo = le_funcionario(arq))) { erro = 1; break; }
