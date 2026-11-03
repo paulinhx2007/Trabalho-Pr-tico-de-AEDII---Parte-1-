@@ -158,6 +158,120 @@ int selecao_natural(FILE *arq, Lista *nomes, int M, int nFunc, int n) {
 int selecao_natural(FILE *arq, Lista *nome_arquivos_saida, int M, int nFunc, int n);
 ```
 
+
 ## Intercalação
 
+Intercalação das partições utilizando **Árvore Binária de Vencedores**.
+
 Funções implementadas:
+
+- intercalacao.h:
+
+```c
+void intercalacao_arvore_de_vencedores(char *nome_arquivo_saida, int num_p, Lista *nome_particoes);
+```
+
+- intercalacao.c:
+
+```c
+/* Carrega em p->func o registro da posicao aux_p. NULL = particao esgotada */
+static void carrega(TVet *p) {
+    fseek(p->f, (long) p->aux_p * tamanho_registro(), SEEK_SET);
+    p->func = le_funcionario(p->f);
+}
+
+/* Devolve o indice da particao com menor cod. func == NULL conta como "infinito" */
+static int vencedor(int a, int b, TVet *v) {
+    if (v[a].func == NULL) return b;
+    if (v[b].func == NULL) return a;
+    return (v[a].func->cod <= v[b].func->cod) ? a : b;
+}
+
+/* Monta a arvore de baixo para cima (P = numero de folhas) */
+static void constroi(int arv[], TVet *v, int P) {
+    for (int i = 0; i < P; i++)
+        arv[P + i] = i;                          /* folhas guardam o indice da particao */
+    for (int p = P - 1; p >= 1; p--)
+        arv[p] = vencedor(arv[2 * p], arv[2 * p + 1], v);
+}
+
+/* Refaz so o caminho da folha i ate a raiz */
+static void atualiza(int arv[], TVet *v, int P, int i) {
+    int j = (P + i) / 2;
+    while (j >= 1) {
+        arv[j] = vencedor(arv[2 * j], arv[2 * j + 1], v);
+        j = j / 2;
+    }
+}
+
+void intercalacao_arvore_de_vencedores(char *nome_arquivo_saida, int num_p, Lista *nome_particoes) {
+    int P = 1, erro = 0, escritos = 0;
+    while (P < num_p) P *= 2;                    /* completa ate potencia de 2 */
+
+    TVet *v = calloc((size_t) P, sizeof(TVet));  /* folhas extras: func = NULL, f = NULL */
+    int *arv = malloc(2 * (size_t) P * sizeof(int));
+    FILE *out = fopen(nome_arquivo_saida, "wb");
+
+    if (!v || !arv || !out) {
+        printf("Erro ao alocar memoria ou criar %s.\n", nome_arquivo_saida);
+        erro = 1;
+    }
+
+    /* Abre cada particao e carrega o primeiro registro */
+    for (int i = 0; i < num_p && !erro; i++) {
+        if (!nome_particoes) {
+            printf("Faltam nomes de particoes.\n");
+            erro = 1;
+            break;
+        }
+        v[i].f = fopen(nome_particoes->nome, "rb");
+        if (!v[i].f) {
+            printf("Erro ao abrir %s.\n", nome_particoes->nome);
+            erro = 1;
+            break;
+        }
+        v[i].aux_p = 0;
+        carrega(&v[i]);
+        nome_particoes = nome_particoes->prox;
+    }
+
+    if (!erro) {
+        constroi(arv, v, P);
+
+        /* arv[1] = particao com o menor registro neste momento */
+        while (v[arv[1]].func != NULL) {
+            int i = arv[1];
+
+            fseek(out, (long) escritos * tamanho_registro(), SEEK_SET);
+            salva_funcionario(v[i].func, out);
+            escritos++;
+
+            free(v[i].func);
+            v[i].aux_p++;
+            carrega(&v[i]);                      /* proximo registro da mesma particao */
+            atualiza(arv, v, P, i);
+        }
+    }
+
+    /* Limpeza */
+    if (v) {
+        for (int i = 0; i < P; i++) {
+            if (v[i].func) free(v[i].func);
+            if (v[i].f) fclose(v[i].f);
+        }
+    }
+    if (out) fclose(out);
+    free(v);
+    free(arv);
+}
+```
+
+Descrição das funções:
+
+- `carrega`: lê da partição o registro da posição atual. Devolve `NULL` quando a partição acabou.
+- `vencedor`: compara dois nós e devolve o índice da partição com o menor `cod`. Partição esgotada conta como "infinito".
+- `constroi`: monta a árvore de baixo para cima, a partir do primeiro registro de cada partição.
+- `atualiza`: depois de consumir um registro, refaz só o caminho da folha até a raiz.
+- `intercalacao_arvore_de_vencedores`: abre as partições, executa o laço principal (grava o menor registro, lê o próximo da mesma partição, atualiza a árvore) e grava o arquivo final.
+
+Uso: no menu do `main.c`, opção 9 (depois de gerar as partições com a opção 5 ou 6).
