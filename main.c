@@ -184,7 +184,7 @@ int main(){
                     fclose(fi);
                 }else printf("Particoes nao foram criadas, crie as particoes utilizando as opcoes 5 ou 6 do menu!!!\n");
                 break;
-              case (9):
+              case (9):   // o resultado dessa intercalação deve ser comparado ao resultado do case 8
                 if(criouparticoes){
                     printf("\n\nIntercalando as particoes, utilizando a arvore de vencedores.\n");
                     intercalacao_arvore_de_vencedores("arquivo_intercalado.dat", nParticoes, nomes);
@@ -193,7 +193,7 @@ int main(){
                     imprime_base_dados_funcionarios(fi,nFunc);
                     fclose(fi);
                 }else printf("Particoes nao foram criadas, crie as particoes utilizando as opcoes 5 ou 6 do menu!!!\n");
-                break;
+                break;   
             case (10):
                 //cria árvore binária em memória utilizando o arquivo de índice primário ordenado
                 if(crioubase==1){
