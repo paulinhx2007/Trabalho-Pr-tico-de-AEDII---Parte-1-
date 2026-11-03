@@ -18,7 +18,7 @@ void intercalacao_basico(char *nome_arquivo_saida, int num_p, Lista *nome_partic
 
 static void carrega(TVet *p);
 
-
+static int vencedor(int a, int b, TVet *v);
 /* Algoritmo de intercalacao de particoes usando arvore de vencedores a ser implementado no trabalho,
  fiquem a vontade para modificar a estrutura dos parâmetros, somente uma sugestão*/
 void intercalacao_arvore_de_vencedores(char *nome_arquivo_saida, int num_p, Lista *nome_particoes);
