@@ -184,19 +184,15 @@ int main(){
                     fclose(fi);
                 }else printf("Particoes nao foram criadas, crie as particoes utilizando as opcoes 5 ou 6 do menu!!!\n");
                 break;
-            case (9):
-                printf("Metodo a ser implementado na parte I do trabalho.\n");
+              case (9):
                 if(criouparticoes){
-                    if(crioupilhas){
-                        intercalacao_arvore_de_vencedores(vetPilhas, vetTopo, "arquivo_intercalado.dat", nParticoes);
-                    }else printf("As pilhas das particoes geradas nao foram criadas, crie as pilhas utilizando as opcoes 7!!!\n");
-                }else printf("Particoes nao foram criadas, crie as particoes utilizando as opcoes 5 ou 6  do menu!!!\n");
-
-
-                //imprimindo o arquivo intercalado
-                FILE *fi = fopen("arquivo_intercalado.dat","rb+");
-                imprime_base_dados_funcionarios(fi,nFunc);
-                fclose(fi);
+                    printf("\n\nIntercalando as particoes, utilizando a arvore de vencedores.\n");
+                    intercalacao_arvore_de_vencedores("arquivo_intercalado.dat", nParticoes, nomes);
+                    //imprimindo o arquivo intercalado
+                    FILE *fi = fopen("arquivo_intercalado.dat","rb+");
+                    imprime_base_dados_funcionarios(fi,nFunc);
+                    fclose(fi);
+                }else printf("Particoes nao foram criadas, crie as particoes utilizando as opcoes 5 ou 6 do menu!!!\n");
                 break;
             case (10):
                 //cria árvore binária em memória utilizando o arquivo de índice primário ordenado
