@@ -14,7 +14,11 @@ TFunc *funcionario(int cod, char *nome, char *cpf, char *data, double salario){
 }
 
 int tamanho_registro() {
-  return sizeof(TFunc);
+    return sizeof(int)
+         + TAM_NOME * sizeof(char)
+         + 15 * sizeof(char)
+         + 11 * sizeof(char)
+         + sizeof(double);
 }
 
 void imprime_funcionario(TFunc *funcionario){

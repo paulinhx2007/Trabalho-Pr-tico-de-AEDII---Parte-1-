@@ -158,120 +158,86 @@ int selecao_natural(FILE *arq, Lista *nomes, int M, int nFunc, int n) {
 int selecao_natural(FILE *arq, Lista *nome_arquivos_saida, int M, int nFunc, int n);
 ```
 
-
 ## Intercalação
 
-Intercalação das partições utilizando **Árvore Binária de Vencedores**.
-
 Funções implementadas:
+### intercalacao.c
 
-- intercalacao.h:
+**Estrutura auxiliar criada:**
 
 ```c
-void intercalacao_arvore_de_vencedores(char *nome_arquivo_saida, int num_p, Lista *nome_particoes);
+typedef struct {
+    int particao;
+    int codigo;
+} TNoVencedor;
 ```
 
-- intercalacao.c:
+A estrutura `TNoVencedor` armazena o índice da partição e o código do funcionário utilizado nas comparações da árvore.
+
+**Função auxiliar implementada:**
 
 ```c
-/* Carrega em p->func o registro da posicao aux_p. NULL = particao esgotada */
-static void carrega(TVet *p) {
-    fseek(p->f, (long) p->aux_p * tamanho_registro(), SEEK_SET);
-    p->func = le_funcionario(p->f);
-}
+TNoVencedor escolher_vencedor(TNoVencedor a, TNoVencedor b);
+```
 
-/* Devolve o indice da particao com menor cod. func == NULL conta como "infinito" */
-static int vencedor(int a, int b, TVet *v) {
-    if (v[a].func == NULL) return b;
-    if (v[b].func == NULL) return a;
-    return (v[a].func->cod <= v[b].func->cod) ? a : b;
-}
+Compara dois candidatos e retorna aquele que possui o menor código. Essa função é utilizada tanto na construção quanto na atualização da árvore.
 
-/* Monta a arvore de baixo para cima (P = numero de folhas) */
-static void constroi(int arv[], TVet *v, int P) {
-    for (int i = 0; i < P; i++)
-        arv[P + i] = i;                          /* folhas guardam o indice da particao */
-    for (int p = P - 1; p >= 1; p--)
-        arv[p] = vencedor(arv[2 * p], arv[2 * p + 1], v);
-}
+**Função principal implementada:**
 
-/* Refaz so o caminho da folha i ate a raiz */
-static void atualiza(int arv[], TVet *v, int P, int i) {
-    int j = (P + i) / 2;
-    while (j >= 1) {
-        arv[j] = vencedor(arv[2 * j], arv[2 * j + 1], v);
-        j = j / 2;
-    }
-}
+```c
+void intercalacao_arvore_de_vencedores(TPilha **pilha, int *vetTop, char *nome_arquivo_saida, int num_p);
+```
 
-void intercalacao_arvore_de_vencedores(char *nome_arquivo_saida, int num_p, Lista *nome_particoes) {
-    int P = 1, erro = 0, escritos = 0;
-    while (P < num_p) P *= 2;                    /* completa ate potencia de 2 */
+Realiza a intercalação dos funcionários armazenados nas partições, utilizando uma Árvore Binária de Vencedores.
 
-    TVet *v = calloc((size_t) P, sizeof(TVet));  /* folhas extras: func = NULL, f = NULL */
-    int *arv = malloc(2 * (size_t) P * sizeof(int));
-    FILE *out = fopen(nome_arquivo_saida, "wb");
+O algoritmo inicialmente prepara os candidatos de cada partição e constrói a árvore por meio de comparações entre os códigos dos funcionários.
 
-    if (!v || !arv || !out) {
-        printf("Erro ao alocar memoria ou criar %s.\n", nome_arquivo_saida);
-        erro = 1;
-    }
+A raiz da árvore identifica a partição que contém o menor funcionário disponível. Esse funcionário é gravado no arquivo de saída, e o topo da pilha correspondente é atualizado.
 
-    /* Abre cada particao e carrega o primeiro registro */
-    for (int i = 0; i < num_p && !erro; i++) {
-        if (!nome_particoes) {
-            printf("Faltam nomes de particoes.\n");
-            erro = 1;
-            break;
-        }
-        v[i].f = fopen(nome_particoes->nome, "rb");
-        if (!v[i].f) {
-            printf("Erro ao abrir %s.\n", nome_particoes->nome);
-            erro = 1;
-            break;
-        }
-        v[i].aux_p = 0;
-        carrega(&v[i]);
-        nome_particoes = nome_particoes->prox;
-    }
+Em seguida, o algoritmo atualiza o caminho da folha modificada até a raiz, identificando o próximo vencedor. O procedimento continua até que todas as partições sejam processadas.
 
-    if (!erro) {
-        constroi(arv, v, P);
+A implementação também considera quantidades de partições que não são potências de 2, utilizando folhas auxiliares com o valor `INT_MAX`.
 
-        /* arv[1] = particao com o menor registro neste momento */
-        while (v[arv[1]].func != NULL) {
-            int i = arv[1];
+### intercalacao.h
 
-            fseek(out, (long) escritos * tamanho_registro(), SEEK_SET);
-            salva_funcionario(v[i].func, out);
-            escritos++;
+**Declaração da função principal:**
 
-            free(v[i].func);
-            v[i].aux_p++;
-            carrega(&v[i]);                      /* proximo registro da mesma particao */
-            atualiza(arv, v, P, i);
-        }
-    }
+```c
+void intercalacao_arvore_de_vencedores(TPilha **pilha, int *vetTop, char *nome_arquivo_saida, int num_p);
+```
 
-    /* Limpeza */
-    if (v) {
-        for (int i = 0; i < P; i++) {
-            if (v[i].func) free(v[i].func);
-            if (v[i].f) fclose(v[i].f);
-        }
-    }
-    if (out) fclose(out);
-    free(v);
-    free(arv);
+### funcionario.c
+
+**Função corrigida:**
+
+```c
+int tamanho_registro() {
+    return sizeof(int)
+         + TAM_NOME * sizeof(char)
+         + 15 * sizeof(char)
+         + 11 * sizeof(char)
+         + sizeof(double);
 }
 ```
 
-Descrição das funções:
+A função foi corrigida para considerar o tamanho dos campos efetivamente gravados no arquivo binário, evitando problemas de leitura causados pelo preenchimento da estrutura em memória.
 
-- `carrega`: lê da partição o registro da posição atual. Devolve `NULL` quando a partição acabou.
-- `vencedor`: compara dois nós e devolve o índice da partição com o menor `cod`. Partição esgotada conta como "infinito".
-- `constroi`: monta a árvore de baixo para cima, a partir do primeiro registro de cada partição.
-- `atualiza`: depois de consumir um registro, refaz só o caminho da folha até a raiz.
-- `intercalacao_arvore_de_vencedores`: abre as partições, executa o laço principal (grava o menor registro, lê o próximo da mesma partição, atualiza a árvore) e grava o arquivo final.
+### Testes realizados
 
-Uso: no menu do `main.c`, opção 9 (depois de gerar as partições com a opção 5 ou 6).
+**Teste 1 — Seleção Natural**
+
+- Base de 20 funcionários.
+- Geração de 3 partições.
+- Intercalação utilizando Árvore de Vencedores.
+- Comparação com a Intercalação Básica.
+- Resultado: arquivos binários idênticos.
+
+**Teste 2 — Classificação Interna**
+
+- Base de 20 funcionários.
+- Geração de 10 partições, com 2 funcionários cada.
+- Intercalação utilizando Árvore de Vencedores.
+- Comparação com a Intercalação Básica.
+- Resultado: arquivos binários idênticos.
+
+Os dois testes foram aprovados, produzindo os 20 funcionários em ordem crescente de código.
