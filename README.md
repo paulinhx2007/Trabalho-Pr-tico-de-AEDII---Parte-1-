@@ -327,22 +327,6 @@ A implementação também considera quantidades de partições que não são pot
 void intercalacao_arvore_de_vencedores(TPilha **pilha, int *vetTop, char *nome_arquivo_saida, int num_p);
 ```
 
-### funcionario.c
-
-**Função corrigida:**
-
-```c
-int tamanho_registro() {
-    return sizeof(int)
-         + TAM_NOME * sizeof(char)
-         + 15 * sizeof(char)
-         + 11 * sizeof(char)
-         + sizeof(double);
-}
-```
-
-A função foi corrigida para considerar o tamanho dos campos efetivamente gravados no arquivo binário, evitando problemas de leitura causados pelo preenchimento da estrutura em memória.
-
 ### Testes realizados
 
 **Teste 1 — Seleção Natural**
