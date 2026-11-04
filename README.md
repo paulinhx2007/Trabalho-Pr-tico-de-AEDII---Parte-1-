@@ -160,21 +160,19 @@ int selecao_natural(FILE *arq, Lista *nome_arquivos_saida, int M, int nFunc, int
 
 ## Intercalação
 
-## Intercalação
+Intercalação das partições utilizando **Árvore Binária de Vencedores**.
 
-Intercalação das partições utilizando *Árvore Binária de Vencedores*.
+## Funções implementadas
 
-Funções implementadas:
+### `intercalacao.h`
 
-- intercalacao.h:
-
-c
+```c
 void intercalacao_arvore_de_vencedores(char *nome_arquivo_saida, int num_p, Lista *nome_particoes);
+```
 
+### `intercalacao.c`
 
-- intercalacao.c:
-
-c
+```c
 /* Carrega em p->func o registro da posicao aux_p. NULL = particao esgotada */
 static void carrega(TVet *p) {
     fseek(p->f, (long) p->aux_p * tamanho_registro(), SEEK_SET);
@@ -191,7 +189,7 @@ static int vencedor(int a, int b, TVet *v) {
 /* Monta a arvore de baixo para cima (P = numero de folhas) */
 static void constroi(int arv[], TVet *v, int P) {
     for (int i = 0; i < P; i++)
-        arv[P + i] = i;                          /* folhas guardam o indice da particao */
+        arv[P + i] = i;                 /* folhas guardam o indice da particao */
     for (int p = P - 1; p >= 1; p--)
         arv[p] = vencedor(arv[2 * p], arv[2 * p + 1], v);
 }
@@ -207,7 +205,7 @@ static void atualiza(int arv[], TVet *v, int P, int i) {
 
 void intercalacao_arvore_de_vencedores(char *nome_arquivo_saida, int num_p, Lista *nome_particoes) {
     int P = 1, erro = 0, escritos = 0;
-    while (P < num_p) P *= 2;                    /* completa ate potencia de 2 */
+    while (P < num_p) P *= 2;           /* completa ate potencia de 2 */
 
     TVet *v = calloc((size_t) P, sizeof(TVet));  /* folhas extras: func = NULL, f = NULL */
     int *arv = malloc(2 * (size_t) P * sizeof(int));
@@ -249,7 +247,7 @@ void intercalacao_arvore_de_vencedores(char *nome_arquivo_saida, int num_p, List
 
             free(v[i].func);
             v[i].aux_p++;
-            carrega(&v[i]);                      /* proximo registro da mesma particao */
+            carrega(&v[i]);             /* proximo registro da mesma particao */
             atualiza(arv, v, P, i);
         }
     }
@@ -265,6 +263,7 @@ void intercalacao_arvore_de_vencedores(char *nome_arquivo_saida, int num_p, List
     free(v);
     free(arv);
 }
+```
 
 
 Descrição das funções:
@@ -277,7 +276,7 @@ Descrição das funções:
 
 Uso: no menu do main.c, opção 9 (depois de gerar as partições com a opção 5 ou 6).
 
-**-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------**
+**-------------------------------------------------------------------------------------------------------------------------------------------**
 
 
 Funções implementadas:
